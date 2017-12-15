@@ -5,6 +5,7 @@ apply plugin: 'signing'
 version = "1.1.31"
 group = "com.kbeanie"
 
+
 signing {
     required {
         has("release") && gradle.taskGraph.hasTask("uploadArchives")
@@ -15,6 +16,7 @@ signing {
 uploadArchives {
     configuration = configurations.archives
     repositories.mavenDeployer {
+
         beforeDeployment {
             MavenDeployment deployment -> signing.signPom(deployment)
         }
