@@ -15,7 +15,9 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.kbeanie.multipicker.api.CacheLocation;
@@ -362,11 +364,15 @@ public class FileProcessorThread extends Thread {
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
             if (isDownloadsDocument(uri)) {
-                final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                try {
+                    final String id = DocumentsContract.getDocumentId(uri);
+                    final Uri contentUri = ContentUris.withAppendedId(
+                            Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
 
-                return getDataAndMimeType(contentUri, null, null, file.getType());
+                    return getDataAndMimeType(contentUri, null, null, file.getType());
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
             }
             // MediaProvider
             else if (isMediaDocument(uri)) {
@@ -405,7 +411,7 @@ public class FileProcessorThread extends Thread {
             return data;
         }
 
-        return null;
+        return new String[]{null,null};
     }
 
     private String[] getDataAndMimeType(Uri uri, String selection,
